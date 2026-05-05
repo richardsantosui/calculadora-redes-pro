@@ -3,131 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <<title>Calculadora de Redes</title> | Richard Santos</title>
+    <title>Calculadora de Redes</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* --- TEMA DARK PROFISSIONAL (Zero cara de IA) --- */
         :root {
-            --bg-body: #0f172a; /* Azul muito escuro */
+            --bg-body: #0f172a;
             --bg-card: #1e293b;
             --texto-principal: #f8fafc;
             --texto-secundario: #94a3b8;
-            --accent: #10b981; /* Verde esmeralda (sucesso/terminal) */
+            --accent: #10b981;
             --accent-hover: #059669;
             --bordas: #334155;
-            --destaque-ip: #38bdf8; /* Azul claro para números */
         }
 
-        body { 
-            font-family: 'Segoe UI', system-ui, sans-serif; 
-            background-color: var(--bg-body); 
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg-body);
             color: var(--texto-principal);
             padding: 20px;
             display: flex;
             justify-content: center;
+            min-height: 100vh;
+            margin: 0;
         }
 
-        .card { 
-            background: var(--bg-card); 
-            padding: 30px; 
-            border-radius: 12px; 
+        .card {
+            background-color: var(--bg-card);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
             width: 100%;
-            max-width: 800px; 
+            max-width: 650px;
             border: 1px solid var(--bordas);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            height: fit-content;
         }
 
         .header {
+            text-align: center;
+            margin-bottom: 2rem;
             border-bottom: 1px solid var(--bordas);
-            padding-bottom: 15px;
-            margin-bottom: 25px;
+            padding-bottom: 1rem;
         }
 
-        .header h1 { margin: 0 0 5px 0; font-size: 24px; display: flex; align-items: center; gap: 10px; }
-        .header p { margin: 0; color: var(--texto-secundario); font-size: 14px; }
+        h1 { color: var(--accent); margin: 0; font-size: 1.8rem; }
+        .header p { color: var(--texto-secundario); font-size: 0.9rem; margin-top: 5px; }
 
-        .input-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; color: var(--texto-secundario); }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem; }
+
+        .input-group { margin-bottom: 1rem; }
+        label { display: block; margin-bottom: 0.5rem; color: var(--texto-secundario); font-size: 0.85rem; }
         
-        input { 
-            width: 100%; 
-            padding: 12px; 
-            background: var(--bg-body); 
-            border: 1px solid var(--bordas); 
-            color: var(--texto-principal);
-            border-radius: 6px;
-            font-family: 'Consolas', monospace; /* Fonte de código para IPs */
-            font-size: 16px;
-            box-sizing: border-box;
-            outline: none;
-        }
-        input:focus { border-color: var(--accent); }
-
-        button { 
-            width: 100%; 
-            padding: 14px; 
-            background: var(--accent); 
-            color: white; 
-            border: none; 
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer; 
-            transition: background 0.3s ease;
-            margin-top: 10px;
-        }
-        button:hover { background: var(--accent-hover); }
-
-        /* --- SESSÃO DE RESULTADOS --- */
-        .resultado { 
-            border-top: 1px dashed var(--bordas); 
-            margin-top: 30px; 
-            padding-top: 25px; 
-            display: none; 
-        }
-
-        .badge-classe {
-            display: inline-block;
-            background: rgba(56, 189, 248, 0.1);
-            color: var(--destaque-ip);
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 14px;
-            margin-bottom: 10px;
-            border: 1px solid rgba(56, 189, 248, 0.2);
-        }
-
-        .grid { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 20px; 
-            margin-top: 20px; 
-        }
-        
-        @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
-
-        .dados-bloco {
-            background: var(--bg-body);
-            padding: 15px;
-            border-radius: 8px;
+        input {
+            width: 100%;
+            padding: 0.8rem;
+            background-color: var(--bg-body);
             border: 1px solid var(--bordas);
+            border-radius: 6px;
+            color: white;
+            font-family: 'Courier New', monospace;
+            box-sizing: border-box;
         }
 
-        .dados-bloco p { margin: 8px 0; font-size: 15px; }
-        .dados-bloco span { 
-            font-family: 'Consolas', monospace; 
-            color: var(--destaque-ip); 
+        button {
+            width: 100%;
+            padding: 1rem;
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
             font-weight: bold;
+            cursor: pointer;
+            margin-top: 1rem;
+            text-transform: uppercase;
+            transition: 0.3s;
         }
 
-        code { 
-            display: block;
-            background: #000; 
-            color: #10b981; 
-            padding: 8px; 
+        button:hover { background-color: var(--accent-hover); }
+
+        .results {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px dashed var(--bordas);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .res-box h3 { font-size: 0.9rem; color: var(--accent); margin-bottom: 10px; }
+        .res-item { margin-bottom: 8px; font-size: 0.95rem; }
+        .label { font-weight: bold; }
+        .value { font-family: 'Courier New', monospace; color: #60a5fa; }
+        .value.ip { color: #f87171; }
+
+        .binary-box {
+            background: #000;
+            padding: 10px;
             border-radius: 4px;
-            font-size: 13px;
-            margin-top: 5px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: #4ade80;
             overflow-x: auto;
         }
     </style>
@@ -138,78 +112,46 @@
             <h1><i class="fas fa-network-wired"></i> Calculadora de Redes</h1>
             <p>Auditoria e Endereçamento IPv4 | Dev: Richard Santos</p>
         </div>
-        <div class="grid" style="margin-top: 0;">
-            <div class="input-group">
-                <label>Bloco de Rede Origem (Ex: 9.6.0.0)</label>
-                <input type="text" id="ip" value="9.6.0.0">
-            </div>
-            <div class="input-group">
-                <label>Novo Prefixo (CIDR)</label>
-                <input type="number" id="prefixo" value="20">
-            </div>
-        </div>
-        
-        <div class="input-group">
-            <label>Navegar para a Sub-rede nº:</label>
-            <input type="number" id="n_rede" value="1">
-        </div>
-        
-        <button onclick="calcular()">PROCESSAR CÁLCULO</button>
 
-        <div id="res" class="resultado">
-            <div class="badge-classe" id="nome_classe"></div>
-            <p id="desc_classe" style="color: var(--texto-secundario); font-size: 14px; margin-top: 0;"></p>
-            
+        <form method="POST">
             <div class="grid">
-                <div class="dados-bloco">
-                    <p><strong>Máscara:</strong> <span id="mascara"></span></p>
-                    <p><strong>ID de Rede:</strong> <span id="id_rede"></span></p>
-                    <p><strong>Primeiro IP Útil:</strong> <span id="primeiro_ip"></span></p>
-                    <p><strong>Último IP Útil:</strong> <span id="ultimo_ip" style="color: #f43f5e;"></span></p>
-                    <p><strong>Broadcast:</strong> <span id="broadcast"></span></p>
+                <div class="input-group">
+                    <label>Bloco de Rede Origem (Ex: 9.6.0.0)</label>
+                    <input type="text" name="ip" value="{{ ip_input or '9.6.0.0' }}" required>
                 </div>
-                
-                <div class="dados-bloco">
-                    <p><strong>Total de Hosts Úteis:</strong> <span id="hosts_uteis"></span></p>
-                    <p style="margin-top: 15px;"><strong>Bits do IP:</strong> <code id="bin_ip"></code></p>
-                    <p><strong>Bits da Máscara:</strong> <code id="bin_mask"></code></p>
+                <div class="input-group">
+                    <label>Novo Prefixo (CIDR)</label>
+                    <input type="number" name="prefixo" value="{{ prefixo_input or '20' }}" min="1" max="32" required>
                 </div>
             </div>
+            
+            <div class="input-group">
+                <label>Navegar para a Sub-rede nº:</label>
+                <input type="number" name="subrede_index" value="{{ subrede_index or '1' }}" min="1">
+            </div>
+
+            <button type="submit">Processar Cálculo</button>
+        </form>
+
+        {% if resultado %}
+        <div class="results">
+            <div class="res-box">
+                <div class="res-item"><span class="label">Máscara:</span> <span class="value">{{ resultado.mascara }}</span></div>
+                <div class="res-item"><span class="label">ID de Rede:</span> <span class="value">{{ resultado.rede_id }}</span></div>
+                <div class="res-item"><span class="label">Primeiro IP Útil:</span> <span class="value">{{ resultado.primeiro_ip }}</span></div>
+                <div class="res-item"><span class="label">Último IP Útil:</span> <span class="value ip">{{ resultado.ultimo_ip }}</span></div>
+                <div class="res-item"><span class="label">Broadcast:</span> <span class="value">{{ resultado.broadcast }}</span></div>
+            </div>
+
+            <div class="res-box">
+                <h3>Total de Hosts Úteis: {{ resultado.hosts_uteis }}</h3>
+                <label>Bits do IP:</label>
+                <div class="binary-box">{{ resultado.ip_binario }}</div>
+                <label style="margin-top:10px">Bits da Máscara:</label>
+                <div class="binary-box">{{ resultado.mascara_binaria }}</div>
+            </div>
         </div>
+        {% endif %}
     </div>
-
-    <script>
-        async function calcular() {
-            const dados = {
-                ip: document.getElementById('ip').value,
-                prefixo: document.getElementById('prefixo').value,
-                n_rede: document.getElementById('n_rede').value
-            };
-
-            const response = await fetch('/calcular', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(dados)
-            });
-
-            const res = await response.json();
-            if(response.ok) {
-                document.getElementById('res').style.display = 'block';
-                document.getElementById('nome_classe').innerText = res.nome_classe;
-                document.getElementById('desc_classe').innerText = res.desc_classe;
-                document.getElementById('mascara').innerText = res.mascara;
-                document.getElementById('id_rede').innerText = res.id_rede;
-                document.getElementById('primeiro_ip').innerText = res.primeiro_ip;
-                // Adicionei o último IP que faltava no seu front-end:
-                document.getElementById('ultimo_ip').innerText = res.ultimo_ip; 
-                document.getElementById('broadcast').innerText = res.broadcast;
-                document.getElementById('hosts_uteis').innerText = res.hosts_uteis;
-                document.getElementById('bin_ip').innerText = res.bin_ip;
-                document.getElementById('bin_mask').innerText = res.bin_mask;
-            } else {
-                alert("⚠️ Erro: " + res.erro);
-            }
-        }
-    </script>
 </body>
 </html>
