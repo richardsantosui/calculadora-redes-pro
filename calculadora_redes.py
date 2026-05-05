@@ -1,0 +1,72 @@
+import os
+import ipaddress
+from flask import Flask, render_template, request, jsonify
+
+# Configuração do caminho da pasta templates (O "GPS" do Flask)
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
+
+app = Flask(__name__, template_folder=TEMPLATE_DIR)
+
+def identificar_classe_real(ip_str):
+    try:
+        primeiro_octeto = int(ip_str.split('.')[0])
+        if 1 <= primeiro_octeto <= 126:
+            return "Classe A", 16777216, 8, "Redes de grande porte (Escala Global)."
+        elif 128 <= primeiro_octeto <= 191:
+            return "Classe B", 65536, 16, "Redes de médio porte (Corporativas)."
+        elif 192 <= primeiro_octeto <= 223:
+            return "Classe C", 256, 24, "Redes de pequeno porte (Domésticas/Locais)."
+        return "Especial", 0, 0, "Uso reservado ou multicast."
+    except ValueError:
+        return "Inválido", 0, 0, ""
+
+def formatar_binario(ip_ou_mask):
+    return ".".join([bin(int(x))[2:].zfill(8) for x in str(ip_ou_mask).split('.')])
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/calcular', methods=['POST'])
+def calcular():
+    dados = request.get_json()
+    ip_input = dados.get('ip')
+    prefixo_alvo = int(dados.get('prefixo', 24))
+    n_rede = int(dados.get('n_rede', 1))
+
+    try:
+        nome_classe, cap_total, pref_minimo, desc_classe = identificar_classe_real(ip_input)
+        
+        if prefixo_alvo < pref_minimo:
+            return jsonify({
+                "erro": f"Divisão Impossível: Para a {nome_classe}, o prefixo deve ser no mínimo /{pref_minimo}."
+            }), 400
+
+        ips_por_subrede = 2**(32 - prefixo_alvo)
+        total_subredes = cap_total // ips_por_subrede if cap_total > 0 else 1
+        
+        ip_base_int = int(ipaddress.IPv4Address(ip_input.split('/')[0]))
+        ip_sub_int = ip_base_int + ((n_rede - 1) * ips_por_subrede)
+        rede_atual = ipaddress.ip_network(f"{ipaddress.IPv4Address(ip_sub_int)}/{prefixo_alvo}", strict=False)
+
+        return jsonify({
+            "nome_classe": nome_classe,
+            "total_subredes": f"{total_subredes:,}".replace(",", "."),
+            "cap_total": f"{cap_total:,}".replace(",", "."),
+            "desc_classe": desc_classe,
+            "mascara": str(rede_atual.netmask),
+            "id_rede": str(rede_atual.network_address),
+            "primeiro_ip": str(rede_atual.network_address + 1),
+            "ultimo_ip": str(rede_atual.broadcast_address - 1),
+            "broadcast": str(rede_atual.broadcast_address),
+            "hosts_uteis": f"{ips_por_subrede - 2:,}".replace(",", "."),
+            "bin_ip": formatar_binario(rede_atual.network_address),
+            "bin_mask": formatar_binario(rede_atual.netmask)
+        })
+
+    except Exception:
+        return jsonify({"erro": "Erro de processamento. Verifique o formato do IP."}), 500
+
+if __name__ == '__main__':
+    app.run(debug=True)
